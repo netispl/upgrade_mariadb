@@ -4,7 +4,8 @@
 
   vars:
     backup: /var/mariadb/backup
-    VR: 3.2.5
+    MDBC-VER: 3.2.5
+    MDB-VER: 10.5
     NRSKL: ''
     BACKUP: "yes"
     QT: "no"
@@ -120,18 +121,18 @@
         dest: "/tmp/"
         timeout: 60
     
-    - name: Pobiermanie sumy kontrolnej mariadb-connector-c-{{ VR }}-src.tar.gz
+    - name: Pobiermanie sumy kontrolnej mariadb-connector-c-{{ MDBC-VER }}-src.tar.gz
       get_url:
-        url: "https://downloads.mariadb.com/Connectors/c/connector-c-{{ VR }}/sha256sums.txt"
+        url: "https://downloads.mariadb.com/Connectors/c/connector-c-{{ MDBC-VER }}/sha256sums.txt"
         dest: "/tmp/"
 
     - name: Zapis sumy kontrolnej
-      shell: "grep -i mariadb-connector-c-{{ VR }}-src.tar.gz /tmp/sha256sums.txt | awk '{ print $1 }'"
+      shell: "grep -i mariadb-connector-c-{{ MDBC-VER }}-src.tar.gz /tmp/sha256sums.txt | awk '{ print $1 }'"
       register: sha256
 
-    - name: Pobranie mariadb-connector-c-{{ VR }}-src.tar.gz
+    - name: Pobranie mariadb-connector-c-{{ MDBC-VER }}-src.tar.gz
       get_url:
-        url: "https://downloads.mariadb.com/Connectors/c/connector-c-{{ VR }}/mariadb-connector-c-{{ VR }}-src.tar.gz"
+        url: "https://downloads.mariadb.com/Connectors/c/connector-c-{{ MDBC-VER }}/mariadb-connector-c-{{ MDBC-VER }}-src.tar.gz"
         dest: "/tmp/"
         timeout: 60
         checksum: "sha256:{{ sha256.stdout }}"
@@ -144,7 +145,7 @@
       shell:
       args:
         executable: /bin/bash
-        cmd: '/tmp/mariadb_repo_setup --mariadb-server-version="mariadb-10.5"'
+        cmd: '/tmp/mariadb_repo_setup --skip-maxscale --mariadb-server-version="mariadb-{{ MDB-VER }}"'
 
     - name: Zmiana wpisu w mariadb.list
       replace:
@@ -209,29 +210,29 @@
         name: mariadb
         state: started
     
-    - name: Rozpakowanie mariadb-connector-c-{{ VR }}-src.tar.gz
+    - name: Rozpakowanie mariadb-connector-c-{{ MDBC-VER }}-src.tar.gz
       unarchive:
-        src: "/tmp/mariadb-connector-c-{{ VR }}-src.tar.gz"
+        src: "/tmp/mariadb-connector-c-{{ MDBC-VER }}-src.tar.gz"
         dest: /tmp
         remote_src: yes 
 
     - name: Zmiana socket-a
       replace:
-        dest: /tmp/mariadb-connector-c-{{ VR }}-src/CMakeLists.txt
+        dest: /tmp/mariadb-connector-c-{{ MDBC-VER }}-src/CMakeLists.txt
         regexp: '/tmp/mysql.sock'
         replace: '/var/run/mysqld/mysqld.sock'
 
-    - name: Kompilacja i instalacja mariadb-connector-c-{{ VR }}-src
+    - name: Kompilacja i instalacja mariadb-connector-c-{{ MDBC-VER }}-src
       shell:
       args:
-        chdir: /tmp/mariadb-connector-c-{{ VR }}-src
+        chdir: /tmp/mariadb-connector-c-{{ MDBC-VER }}-src
         executable: /bin/bash
         cmd: "{{ item }}"    
       environment: 
         CFLAGS: '-g3 -Og -m32 -march=native'
         CXXFLAGS: '${CFLAGS}'
       loop:  
-        - "cmake -DCMAKE_INSTALL_PREFIX=/opt/mariadb-connector-c-{{ VR }}-linux-i686/ -DCMAKE_BUILD_TYPE=RelWithDebInfo ."
+        - "cmake -DCMAKE_INSTALL_PREFIX=/opt/mariadb-connector-c-{{ MDBC-VER }}-linux-i686/ -DCMAKE_BUILD_TYPE=RelWithDebInfo ."
         - make -j4
         - make install
         
