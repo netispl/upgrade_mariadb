@@ -7,7 +7,7 @@
     VR: 3.2.5
     NRSKL: ''
     BACKUP: "yes"
-    QT: "yes"
+    QT: "no"
 
 
   tasks:
@@ -73,7 +73,7 @@
           - python3-mysqldb
         state: present
       ignore_errors: yes
-      when: ansible_distribution_major_version == "20" and mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
+      when: ansible_distribution_major_version | int >= 20 and mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
     
     - name: Instalacja pakietu python-mysqldb
       apt:
