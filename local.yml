@@ -265,6 +265,7 @@
 
 
     - command: mv /usr/local/wagi/Makefile.local /usr/local/wagi/Makefile.local_OLD
+      ignore_errors: true
       when: NRSKL != '00'
 
     - name: Tworzenie /usr/local/wagi/Makefile.local
@@ -272,6 +273,7 @@
         path: /usr/local/wagi/Makefile.local
         state: touch
         mode: '0644'
+      ignore_errors: true
       when: NRSKL != '00'
 
 
@@ -285,11 +287,13 @@
         - 'MYSQL_INCLUDE_PATH=$(shell ${MYSQLCFG} --variable=pkgincludedir)'
         - 'MYSQL_LIB_PATH=$(shell ${MYSQLCFG} --variable=pkglibdir)'
         - 'MYSQL_LIB=-lmariadb'
-        - 'CFLAGS_LOCAL+=-m32'  
+        - 'CFLAGS_LOCAL+=-m32' 
+      ignore_errors: true
       when: NRSKL != '00'
 
     - name: Kompilacja wag
       command: make clean all
+      ignore_errors: true
       args:
         chdir: /usr/local/waginew/src
       when: NRSKL != '00'
