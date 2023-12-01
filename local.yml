@@ -1,6 +1,6 @@
 ---
 - hosts: local
-  become: yes
+  become: "yes"
 
   vars:
     backup: /var/lib/mysql_backup
@@ -29,12 +29,12 @@
       set_fact:
         HM: "{{ version.stdout.split('.')[0] }}"
 
-    - name: Numer sklepu 
-      debug: 
+    - name: Numer sklepu
+      debug:
         msg: "{{ NRSKL }}"
 
     - apt:
-        update_cache: yes
+        update_cache: "yes"
         name: software-properties-common
         state: present
 
@@ -42,14 +42,14 @@
       file:
         path: "{{ backup }}"
         state: absent
-      when: BACKUP == "yes"    
+      when: BACKUP == "yes"
 
     - name: Tworzenie katalogu backup
       file:
         path: "{{ backup }}"
         state: directory
         mode: '0755'
-      when: BACKUP == "yes" 
+      when: BACKUP == "yes"
 
     - name: Start MySql
       service:
@@ -57,20 +57,20 @@
         state: started
 
     - name: Tworzenie backupu baz danych
-      shell: 
+      shell:
       args:
         executable: /bin/bash
         cmd: "mariabackup --backup --user=root --target-dir={{ backup }}"
-      register: mariadb_back 
-      ignore_errors: yes
+      register: mariadb_back
+      ignore_errors: "yes"
       when: BACKUP == "yes"
 
     - name: Tworzenie backupu baz danych - prepare
-      shell: 
+      shell:
       args:
         executable: /bin/bash
         cmd: "mariabackup --prepare --target-dir={{ backup }}"
-      ignore_errors: yes
+      ignore_errors: "yes"
       when: mariadb_back.rc | default ('0') == 0 and BACKUP == "yes"
 
     - name: Instalacja pakietu python3-mysqldb Ubuntu 20
@@ -78,15 +78,15 @@
         name:
           - python3-mysqldb
         state: present
-      ignore_errors: yes
+      ignore_errors: "yes"
       when: ansible_distribution_major_version | int >= 20 and mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
-    
+
     - name: Instalacja pakietu python-mysqldb
       apt:
         name:
           - python-mysqldb
         state: present
-      ignore_errors: yes
+      ignore_errors: "yes"
       when: ansible_distribution_major_version | int < 20 and mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
 
     - name: Czyszczenie katalogu "{{ backup }}"
@@ -99,8 +99,8 @@
         state: dump
         name: all
         encoding: latin2
-        target:  "{{ backup }}/dump_db_{{ ansible_date_time.date }}.sql"
-        single_transaction: yes
+        target: "{{ backup }}/dump_db_{{ ansible_date_time.date }}.sql"
+        single_transaction: "yes"
       when: mariadb_back.rc | default ('0') != 0 and BACKUP == "yes" and HM == "4"
 
     - name: Dump baz danych HM v3
@@ -108,25 +108,25 @@
         state: dump
         name: all
         encoding: latin1
-        target:  "{{ backup }}/dump_db_{{ ansible_date_time.date }}.sql"
-        single_transaction: yes
+        target: "{{ backup }}/dump_db_{{ ansible_date_time.date }}.sql"
+        single_transaction: "yes"
       when: mariadb_back.rc | default ('0') != 0 and BACKUP == "yes" and HM == "3"
-    
+
     - name: Dump widokow
       shell: mysql --skip-column-names --batch -e "SELECT CONCAT('DROP TABLE IF EXISTS ', TABLE_SCHEMA, '.', TABLE_NAME, '; CREATE OR REPLACE VIEW ', TABLE_SCHEMA, '.', TABLE_NAME, ' AS ', VIEW_DEFINITION, '; ') FROM INFORMATION_SCHEMA.VIEWS" > "{{ backup }}/dump_views_{{ ansible_date_time.date }}.sql"
       when: mariadb_back.rc | default ('0') != 0 and BACKUP == "yes" and HM == "4"
 
 
     - name: Dodanie klucza do repo
-        apt_key:
-          url: https://mariadb.org/mariadb_release_signing_key.asc
-          state: present
+      apt_key:
+        url: https://mariadb.org/mariadb_release_signing_key.asc
+        state: present
 
     - name: Dodanie repozytoriow
-        apt_repository:
-          repo: "deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
-          state: present
-          filename: mariadb
+      apt_repository:
+        repo: "deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
+        state: present
+        filename: mariadb
 
     - name: Pobiermanie sumy kontrolnej mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz
       get_url:
@@ -162,16 +162,16 @@
         name:
           - mariadb-*
           - galera-4
-          - galera-3  
-          - libssl-dev  
+          - galera-3
+          - libssl-dev
         state: absent
 
     - name: Instalacja pakietow mariadb-server i mariadb-backup
       apt:
-        update_cache: yes  
+        update_cache: "yes"
         name:
           - mariadb-server
-          - mariadb-backup  
+          - mariadb-backup
           - libssl-dev:i386
         state: present
 
@@ -180,7 +180,7 @@
         path: /etc/mysql/my.cnf
         block: |
           [client]
-          socket = /run/mysqld/mysqld.sock    
+          socket = /run/mysqld/mysqld.sock
 
     - name: Zmiana sql-mode
       replace:
@@ -192,19 +192,19 @@
       lineinfile:
         path: /etc/mysql/mariadb.conf.d/50-server.cnf
         insertafter: '\[mysqld\]'
-        firstmatch: yes
+        firstmatch: "yes"
         line: 'sql-mode = NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
 
     - name: Start MySql
       service:
         name: mariadb
         state: started
-    
+
     - name: Rozpakowanie mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz
       unarchive:
         src: "/tmp/mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz"
         dest: /tmp
-        remote_src: yes 
+        remote_src: "yes"
 
     - name: Zmiana socket-a
       replace:
@@ -217,22 +217,21 @@
       args:
         chdir: /tmp/mariadb-connector-c-{{ MDBC_VER }}-src
         executable: /bin/bash
-        cmd: "{{ item }}"    
-      environment: 
+        cmd: "{{ item }}"
+      environment:
         CFLAGS: '-g3 -Og -m32 -march=native'
         CXXFLAGS: '${CFLAGS}'
-      loop:  
+      loop:
         - "cmake -DCMAKE_INSTALL_PREFIX=/opt/mariadb-connector-c-{{ MDBC_VER }}-linux-i686/ -DCMAKE_BUILD_TYPE=RelWithDebInfo ."
         - make -j4
         - make install
-        
+
     - name: Dodanie wpisow do /etc/ld.so.conf.d/hm.conf
       lineinfile:
         path: /etc/ld.so.conf.d/hm.conf
         line: /opt/mariadb-connector-c-3.2.5-linux-i686/lib/mariadb/
         state: present
 
-   
     - name: Sprawdzanie zrodel do HM
       command: "grep SRC= /usr/local/sklep{{ NRSKL }}/konfiguracja/.src"
       register: src
@@ -246,7 +245,7 @@
         path: "{{ src_path }}/Makefile.local"
         state: absent
         regexp: '.*MYSQL.*'
-        
+
     - name: Dodanie wpisow do Makefile.local
       lineinfile:
         path: "{{ src_path }}/Makefile.local"
@@ -277,7 +276,7 @@
         - 'MYSQL_INCLUDE_PATH=$(shell ${MYSQLCFG} --variable=pkgincludedir)'
         - 'MYSQL_LIB_PATH=$(shell ${MYSQLCFG} --variable=pkglibdir)'
         - 'MYSQL_LIB=-lmariadb'
-        - 'CFLAGS_LOCAL+=-m32' 
+        - 'CFLAGS_LOCAL+=-m32'
       ignore_errors: true
       when: NRSKL != '00'
 
@@ -290,7 +289,7 @@
 
     - name: Kompilacja HM
       shell: make -C "{{ src_path }}/src" clean all
-   
+
     - name: Usuwanie wpisow z /etc/ld.so.conf.d/hm.conf
       lineinfile:
         path: /etc/ld.so.conf.d/hm.conf
@@ -304,33 +303,33 @@
         path: "{{ qsrc_path }}/proj_local.pri"
         replace: 'INCPATH += /opt/mariadb-connector-c-3.2.5-linux-i686/include/mariadb'
         regexp: 'INCPATH.*'
-      when: HM == "4" and QT == "yes"  
+      when: HM == "4" and QT == "yes"
 
     - name: Kompilacja QHM - make clean
       shell: make -C "{{ qsrc_path }}" clean
-      when: HM == "4" and QT == "yes"  
-    
+      when: HM == "4" and QT == "yes"
+
     - name: Kompilacja QHM
       shell: make -C "{{ qsrc_path }}" -j4
-      when: HM == "4" and QT == "yes"  
-    
+      when: HM == "4" and QT == "yes"
+
     - name: Instalacja QHM
       shell: make -C "{{ qsrc_path }}" install
-      when: HM == "4" and QT == "yes"  
+      when: HM == "4" and QT == "yes"
 
     - name: Restart wag
       service:
         name: waga_daemon.service
         state: restarted
-      when: NRSKL != '00'  
+      when: NRSKL != '00'
 
     - name: Restart kdserv-a
-      shell: 
+      shell:
       args:
         executable: /bin/bash
         chdir: "/usr/local/sklep{{ NRSKL }}"
         cmd: bin/restartserv
-        
+
     - name: Usuwanie katalogu /usr/local/lib/mariadb
       file:
         path: /usr/local/lib/mariadb
