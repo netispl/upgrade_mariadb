@@ -9,6 +9,7 @@
     NRSKL: ''
     BACKUP: "yes"
     QT: "no"
+    SKLEP3X: "no"
 
 
   tasks:
@@ -35,7 +36,9 @@
 
     - apt:
         update_cache: "yes"
-        name: software-properties-common
+        name: 
+          - software-properties-common
+          - mariadb-backup
         state: present
 
     - name: Usuwanie katalogu backup
@@ -265,7 +268,6 @@
       ignore_errors: true
       when: NRSKL != '00'
 
-
     - name: Dodanie wpisow do /usr/local/wagi/Makefile.local
       lineinfile:
         path: /usr/local/wagi/Makefile.local
@@ -329,6 +331,44 @@
         executable: /bin/bash
         chdir: "/usr/local/sklep{{ NRSKL }}"
         cmd: bin/restartserv
+
+
+# Kompilacja drugiego magazynu sklep3x
+
+    - name: Sprawdzanie zrodel do HM w sklep3x
+      command: "grep SRC= /usr/local/sklep3x/konfiguracja/.src"
+      register: src_3x
+      when: SKLEP3X == "yes"
+
+    - set_fact:
+        src_3x_path: "{{ src_3x.stdout.split('=')[1] }}"
+      when: SKLEP3X == "yes"
+
+    - name: Usuwanie wpisow z Makefile.local w sklep3x
+      lineinfile:
+        path: "{{ src_3x_path }}/Makefile.local"
+        state: absent
+        regexp: '.*MYSQL.*'
+      when: SKLEP3X == "yes"
+
+    - name: Dodanie wpisow do Makefile.local w sklep3x
+      lineinfile:
+        path: "{{ src_3x_path }}/Makefile.local"
+        state: present
+        line: "MARIADB_CONFIG_BIN=/opt/mariadb-connector-c-{{ MDBC_VER }}-linux-i686/bin/mariadb_config"
+      when: SKLEP3X == "yes"
+
+    - name: Kompilacja HM w sklep3x
+      shell: make -C "{{ src_3x_path }}/src" clean all
+      when: SKLEP3X == "yes"
+
+    - name: Restart kdserv-a sklep3x
+      shell:
+      args:
+        executable: /bin/bash
+        chdir: /usr/local/sklep3x
+        cmd: bin/restartserv
+      when: SKLEP3X == "yes"
 
     - name: Usuwanie katalogu /usr/local/lib/mariadb
       file:
