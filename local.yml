@@ -3,7 +3,7 @@
   become: yes
 
   vars:
-    backup: /var/mariadb/backup
+    backup: /var/lib/mysql_backup
     MDBC_VER: 3.2.5
     MDB_VER: 10.5
     NRSKL: ''
@@ -32,6 +32,11 @@
     - name: Numer sklepu 
       debug: 
         msg: "{{ NRSKL }}"
+
+    - apt:
+        update_cache: yes
+        name: software-properties-common
+        state: present
 
     - name: Usuwanie katalogu backup
       file:
@@ -88,10 +93,6 @@
       shell: "rm -f {{ backup }}/*"
       when: mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
 
-    - apt:
-        update_cache: yes
-        name: vim
-        state: present
 
     - name: Dump baz danych HM v4
       mysql_db:
@@ -115,12 +116,18 @@
       shell: mysql --skip-column-names --batch -e "SELECT CONCAT('DROP TABLE IF EXISTS ', TABLE_SCHEMA, '.', TABLE_NAME, '; CREATE OR REPLACE VIEW ', TABLE_SCHEMA, '.', TABLE_NAME, ' AS ', VIEW_DEFINITION, '; ') FROM INFORMATION_SCHEMA.VIEWS" > "{{ backup }}/dump_views_{{ ansible_date_time.date }}.sql"
       when: mariadb_back.rc | default ('0') != 0 and BACKUP == "yes" and HM == "4"
 
-    - name: Pobranie mariadb_repo_setup
-      get_url:
-        url: "https://downloads.mariadb.com/MariaDB/mariadb_repo_setup"
-        dest: "/tmp/"
-        timeout: 60
-    
+
+    - name: Dodanie klucza do repo
+        apt_key:
+          url: https://mariadb.org/mariadb_release_signing_key.asc
+          state: present
+
+    - name: Dodanie repozytoriow
+        apt_repository:
+          repo: "deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
+          state: present
+          filename: mariadb
+
     - name: Pobiermanie sumy kontrolnej mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz
       get_url:
         url: "https://downloads.mariadb.com/Connectors/c/connector-c-{{ MDBC_VER }}/sha256sums.txt"
@@ -136,23 +143,7 @@
         dest: "/tmp/"
         timeout: 60
         checksum: "sha256:{{ sha256.stdout }}"
-    
-    - file:
-        path: /tmp/mariadb_repo_setup
-        mode: '0777'
 
-    - name: Dodanie nowych repozytoriow
-      shell:
-      args:
-        executable: /bin/bash
-        cmd: '/tmp/mariadb_repo_setup --skip-maxscale --mariadb-server-version="mariadb-{{ MDB_VER }}"'
-
-    - name: Zmiana wpisu w mariadb.list
-      replace:
-        dest: /etc/apt/sources.list.d/mariadb.list
-        regexp: '(.*)(http://)(.*)'
-        replace: '\1https://\3'     
-   
     - name: Ustawienie zmiennej w MySql
       mysql_variables:
         variable: innodb_fast_shutdown
@@ -174,7 +165,6 @@
           - galera-3  
           - libssl-dev  
         state: absent
-
 
     - name: Instalacja pakietow mariadb-server i mariadb-backup
       apt:
@@ -261,7 +251,7 @@
       lineinfile:
         path: "{{ src_path }}/Makefile.local"
         state: present
-        line: 'MARIADB_CONFIG_BIN=/opt/mariadb-connector-c-3.2.5-linux-i686/bin/mariadb_config'
+        line: "MARIADB_CONFIG_BIN=/opt/mariadb-connector-c-{{ MDBC_VER }}-linux-i686/bin/mariadb_config"
 
 
     - command: mv /usr/local/wagi/Makefile.local /usr/local/wagi/Makefile.local_OLD
@@ -283,7 +273,7 @@
         state: present
         line: "{{ item }}"
       loop:
-        - 'MYSQLCFG=/opt/mariadb-connector-c-3.2.5-linux-i686/bin/mariadb_config'    
+        - "MYSQLCFG=/opt/mariadb-connector-c-{{ MDBC_VER }}-linux-i686/bin/mariadb_config"
         - 'MYSQL_INCLUDE_PATH=$(shell ${MYSQLCFG} --variable=pkgincludedir)'
         - 'MYSQL_LIB_PATH=$(shell ${MYSQLCFG} --variable=pkglibdir)'
         - 'MYSQL_LIB=-lmariadb'
