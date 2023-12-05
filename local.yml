@@ -30,16 +30,33 @@
       set_fact:
         HM: "{{ version.stdout.split('.')[0] }}"
 
+    - name: Sprawdzam wersje MySql
+      command: /usr/bin/mysql -V
+      register: mysql_v
+
+    - set_fact:
+        mysql_ver: "{{ mysql_v.stdout.split(' ')[5].split('.')[:2] | join() }}"
+
+    - fail:
+        msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD {{ MDB_VER }}"
+      when: mysql_v | int  >= {{ MDB_VER | join() }} | int
+
     - name: Numer sklepu
       debug:
         msg: "{{ NRSKL }}"
 
     - apt:
         update_cache: "yes"
-        name: 
+        name:
           - software-properties-common
+        state: present
+
+    - apt:
+        update_cache: "no"
+        name:
           - mariadb-backup
         state: present
+      ignore_errors: "yes"
 
     - name: Usuwanie katalogu backup
       file:
