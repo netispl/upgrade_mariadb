@@ -38,7 +38,7 @@
         mysql_ver: "{{ mysql_v.stdout.split(' ')[5].split('.')[:2] | join() }}"
 
     - fail:
-        msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD {{ MDB_VER }}"
+        msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD INSTALOWANEJ {{ MDB_VER }}"
       when: mysql_v | int  >= {{ MDB_VER | join() }} | int
 
     - name: Numer sklepu
