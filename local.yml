@@ -4,8 +4,8 @@
 
   vars:
     backup: /var/lib/mysql_backup
-    MDBC_VER: 3.2.5
-    MDB_VER: 10.5
+    MDBC_VER: "3.2.5"
+    MDB_VER: "10.5"
     NRSKL: ''
     BACKUP: "yes"
     QT: "no"
@@ -38,7 +38,7 @@
         mysql_ver: "{{ mysql_v.stdout.split(' ')[5].split('.')[:2] | join() | int }}"
 
     - set_fact:
-         MDB_VER_INT: "{{ MDB_VER.split('.')[:2] | join() | int }}"
+        MDB_VER_INT: "{{ MDB_VER.split('.')[:2] | join() | int }}"
     
     - fail:
         msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD INSTALOWANEJ {{ MDB_VER }}"
