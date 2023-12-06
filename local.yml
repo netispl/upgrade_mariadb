@@ -39,7 +39,7 @@
 
     - fail:
         msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD INSTALOWANEJ {{ MDB_VER }}"
-      when: mysql_v | int  >= {{ MDB_VER | join() }} | int
+      when: mysql_v | int  >= {{ MDB_VER.split('.')[:2] | join() | int }}
 
     - name: Numer sklepu
       debug:
