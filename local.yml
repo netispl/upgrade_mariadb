@@ -35,11 +35,14 @@
       register: mysql_v
 
     - set_fact:
-        mysql_ver: "{{ mysql_v.stdout.split(' ')[5].split('.')[:2] | join() }}"
+        mysql_ver: "{{ mysql_v.stdout.split(' ')[5].split('.')[:2] | join() | int }}"
 
+    - set_fact:
+         MDB_VER_INT: "{{ MDB_VER.split('.')[:2] | join() | int }}"
+    
     - fail:
         msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD INSTALOWANEJ {{ MDB_VER }}"
-      when: mysql_v | int  >= {{ MDB_VER.split('.')[:2] | join() | int }}
+      when: mysql_ver >= MDB_VER_INT
 
     - name: Numer sklepu
       debug:
