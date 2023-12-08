@@ -3,7 +3,7 @@
   become: "yes"
 
   vars:
-    backup: /var/lib/mysql_backup
+    backup: /usr/local/kopia/mysql_backup
     MDBC_VER: "3.2.5"
     MDB_VER: "10.5"
     NRSKL: ''
@@ -144,6 +144,13 @@
       apt_key:
         url: https://mariadb.org/mariadb_release_signing_key.asc
         state: present
+      when: ansible_distribution_major_version | int > 16
+   
+    - name: Dodanie klucza do repo na Xenial
+      apt_key:
+        url: http://mariadb.org/mariadb_release_signing_key.asc
+        state: present
+      when: ansible_distribution_major_version | int < 18
 
     - name: Dodanie repozytoriow
       apt_repository:
