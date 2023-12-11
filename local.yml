@@ -4,8 +4,8 @@
 
   vars:
     backup: /usr/local/kopia/mysql_backup
-    MDBC_VER: 3.2.5
-    MDB_VER: '10.5'
+    MDBC_VER: "3.2.5"
+    MDB_VER: "10.5"
     NRSKL: ''
     BACKUP: "yes"
     QT: "no"
@@ -252,7 +252,7 @@
         CFLAGS: '-g3 -Og -m32 -march=native'
         CXXFLAGS: '${CFLAGS}'
       loop:
-        - "cmake -DCMAKE_INSTALL_PREFIX=/opt/mariadb-connector-c-{{ MDBC_VER }}-linux-i686/ -DCMAKE_BUILD_TYPE=RelWithDebInfo ."
+        - 'cmake -DCMAKE_INSTALL_PREFIX=/opt/mariadb-connector-c-{{ MDBC_VER }}-linux-i686/ -DCMAKE_BUILD_TYPE=RelWithDebInfo .'
         - make -j4
         - make install
 
