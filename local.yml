@@ -4,7 +4,7 @@
 
   vars:
     backup: /usr/local/kopia/mysql_backup
-    MDBC_VER: '3.2.5'
+    MDBC_VER: 3.2.5
     MDB_VER: '10.5'
     NRSKL: ''
     BACKUP: "yes"
