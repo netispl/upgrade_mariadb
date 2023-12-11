@@ -78,13 +78,13 @@
       service:
         name: mariadb
         state: started
-      when: ansible_distribution_major_version | int > 16
+      when: ansible_distribution_major_version | int > 16 and BACKUP == "yes"
     
     - name: Start MySql
       service:
         name: mysql
         state: started
-      when: ansible_distribution_major_version | int < 18
+      when: ansible_distribution_major_version | int < 18 and BACKUP == "yes"
 
     - name: Tworzenie backupu baz danych
       shell:
