@@ -230,7 +230,7 @@
         name: mariadb
         state: started
 
-    - name: Rozpakowanie mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz
+    - name: "Rozpakowanie mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz"
       unarchive:
         src: "/tmp/mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz"
         dest: /tmp
@@ -242,10 +242,10 @@
         regexp: '/tmp/mysql.sock'
         replace: '/var/run/mysqld/mysqld.sock'
 
-    - name: Kompilacja i instalacja mariadb-connector-c-{{ MDBC_VER }}-src
+    - name: "Kompilacja i instalacja mariadb-connector-c-{{ MDBC_VER }}-src"
       shell:
       args:
-        chdir: /tmp/mariadb-connector-c-{{ MDBC_VER }}-src
+        chdir: "/tmp/mariadb-connector-c-{{ MDBC_VER }}-src"
         executable: /bin/bash
         cmd: "{{ item }}"
       environment:
