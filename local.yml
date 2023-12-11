@@ -193,7 +193,14 @@
       service:
         name: mariadb
         state: stopped
+      when: ansible_distribution_major_version | int > 16
 
+    - name: Stop MySql
+      service:
+        name: mysql
+        state: stopped
+      when: ansible_distribution_major_version | int < 18
+    
     - name: Usuwanie pakietow mariadb-*
       apt:
         name:
