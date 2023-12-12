@@ -54,12 +54,12 @@
           - software-properties-common
         state: present
 
-    - apt:
-        update_cache: "no"
-        name:
-          - mariadb-backup
-        state: present
-      ignore_errors: "yes"
+#    - apt:
+#        update_cache: "no"
+#        name:
+#          - mariadb-backup
+#        state: present
+#      ignore_errors: "yes"
 
     - name: Usuwanie katalogu backup
       file:
