@@ -243,6 +243,13 @@
       service:
         name: mariadb
         state: started
+      when: ansible_distribution_major_version | int > 16
+    
+    - name: Start MySql
+      service:
+        name: mysql
+        state: started
+      when: ansible_distribution_major_version | int < 18
 
     - name: "Rozpakowanie mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz"
       unarchive:
