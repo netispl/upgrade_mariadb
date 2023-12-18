@@ -56,7 +56,17 @@
         update_cache: "yes"
         name:
           - software-properties-common
+          - python3-mysqldb
         state: present
+      when: ansible_distribution_major_version | int >= 20
+
+    - apt:
+        update_cache: "yes"
+        name:
+          - software-properties-common
+          - python-mysqldb
+        state: present
+      when: ansible_distribution_major_version | int < 20
 
 #    - apt:
 #        update_cache: "no"
@@ -107,21 +117,21 @@
       ignore_errors: "yes"
       when: mariadb_back.rc | default ('0') == 0 and BACKUP == "yes"
 
-    - name: Instalacja pakietu python3-mysqldb Ubuntu 20
-      apt:
-        name:
-          - python3-mysqldb
-        state: present
-      ignore_errors: "yes"
-      when: ansible_distribution_major_version | int >= 20 and mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
-
-    - name: Instalacja pakietu python-mysqldb
-      apt:
-        name:
-          - python-mysqldb
-        state: present
-      ignore_errors: "yes"
-      when: ansible_distribution_major_version | int < 20 and mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
+#    - name: Instalacja pakietu python3-mysqldb Ubuntu 20
+#      apt:
+#        name:
+#          - python3-mysqldb
+#        state: present
+#      ignore_errors: "yes"
+#      when: ansible_distribution_major_version | int >= 20 and mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
+#
+#    - name: Instalacja pakietu python-mysqldb
+#      apt:
+#        name:
+#          - python-mysqldb
+#        state: present
+#      ignore_errors: "yes"
+#      when: ansible_distribution_major_version | int < 20 and mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
 
     - name: Czyszczenie katalogu "{{ backup }}"
       shell: "rm -f {{ backup }}/*"
