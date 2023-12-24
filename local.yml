@@ -215,23 +215,23 @@
         state: stopped
       when: ansible_distribution_major_version | int < 18
     
-    - name: Usuwanie pakietow mariadb-*
-      apt:
-        name:
-          - mariadb-*
-          - galera-4
-          - galera-3
-          - libssl-dev
-        state: absent
-
-    - name: Instalacja pakietow mariadb-server i mariadb-backup
-      apt:
-        update_cache: "yes"
-        name:
-          - mariadb-server
-          - mariadb-backup
-          - libssl-dev:i386
-        state: present
+#    - name: Usuwanie pakietow mariadb-*
+#      apt:
+#        name:
+#          - mariadb-*
+#          - galera-4
+#          - galera-3
+#          - libssl-dev
+#        state: absent
+#
+#    - name: Instalacja pakietow mariadb-server i mariadb-backup
+#      apt:
+#        update_cache: "yes"
+#        name:
+#          - mariadb-server
+#          - mariadb-backup
+#          - libssl-dev:i386
+#        state: present
 
     - name: Dodanie wspiu do /etc/mysql/my.cnf
       blockinfile:
