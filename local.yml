@@ -44,9 +44,9 @@
     - set_fact:
         MDB_VER_INT: "{{ MDB_VER.split('.')[:2] | join() | int }}"
     
-    - fail:
-        msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD INSTALOWANEJ {{ MDB_VER }}"
-      when: mysql_ver >= MDB_VER_INT
+#    - fail:
+#        msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD INSTALOWANEJ {{ MDB_VER }}"
+#      when: mysql_ver >= MDB_VER_INT
 
     - name: Numer sklepu
       debug:
