@@ -44,21 +44,21 @@
     - set_fact:
         MDB_VER_INT: "{{ MDB_VER.split('.')[:2] | join() | int }}"
     
-#    - fail:
-#        msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD INSTALOWANEJ {{ MDB_VER }}"
-#      when: mysql_ver >= MDB_VER_INT
+    - fail:
+        msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD INSTALOWANEJ {{ MDB_VER }}"
+      when: mysql_ver >= MDB_VER_INT
 
     - name: Numer sklepu
       debug:
         msg: "{{ NRSKL }}"
 
-#    - apt:
-#        update_cache: "yes"
-#        name:
-#          - software-properties-common
-#          - python3-mysqldb
-#        state: present
-#      when: ansible_distribution_major_version | int >= 20
+    - apt:
+        update_cache: "yes"
+        name:
+          - software-properties-common
+          - python3-mysqldb
+        state: present
+      when: ansible_distribution_major_version | int >= 20
 
     - apt:
         update_cache: "yes"
@@ -67,13 +67,6 @@
           - python-mysqldb
         state: present
       when: ansible_distribution_major_version | int < 20
-
-#    - apt:
-#        update_cache: "no"
-#        name:
-#          - mariadb-backup
-#        state: present
-#      ignore_errors: "yes"
 
     - name: Usuwanie katalogu backup
       file:
@@ -117,26 +110,9 @@
       ignore_errors: "yes"
       when: mariadb_back.rc | default ('0') == 0 and BACKUP == "yes"
 
-#    - name: Instalacja pakietu python3-mysqldb Ubuntu 20
-#      apt:
-#        name:
-#          - python3-mysqldb
-#        state: present
-#      ignore_errors: "yes"
-#      when: ansible_distribution_major_version | int >= 20 and mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
-#
-#    - name: Instalacja pakietu python-mysqldb
-#      apt:
-#        name:
-#          - python-mysqldb
-#        state: present
-#      ignore_errors: "yes"
-#      when: ansible_distribution_major_version | int < 20 and mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
-
     - name: Czyszczenie katalogu "{{ backup }}"
       shell: "rm -f {{ backup }}/*"
       when: mariadb_back.rc | default ('0') != 0 and BACKUP == "yes"
-
 
     - name: Dump baz danych HM v4
       mysql_db:
@@ -215,23 +191,23 @@
         state: stopped
       when: ansible_distribution_major_version | int < 18
     
-#    - name: Usuwanie pakietow mariadb-*
-#      apt:
-#        name:
-#          - mariadb-*
-#          - galera-4
-#          - galera-3
-#          - libssl-dev
-#        state: absent
-#
-#    - name: Instalacja pakietow mariadb-server i mariadb-backup
-#      apt:
-#        update_cache: "yes"
-#        name:
-#          - mariadb-server
-#          - mariadb-backup
-#          - libssl-dev:i386
-#        state: present
+    - name: Usuwanie pakietow mariadb-*
+      apt:
+        name:
+          - mariadb-*
+          - galera-4
+          - galera-3
+          - libssl-dev
+        state: absent
+
+    - name: Instalacja pakietow mariadb-server i mariadb-backup
+      apt:
+        update_cache: "yes"
+        name:
+          - mariadb-server
+          - mariadb-backup
+          - libssl-dev:i386
+        state: present
 
     - name: Dodanie wspiu do /etc/mysql/my.cnf
       blockinfile:
