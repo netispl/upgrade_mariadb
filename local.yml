@@ -44,21 +44,21 @@
     - set_fact:
         MDB_VER_INT: "{{ MDB_VER.split('.')[:2] | join() | int }}"
     
-#    - fail:
-#        msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD INSTALOWANEJ {{ MDB_VER }}"
-#      when: mysql_ver >= MDB_VER_INT
+    - fail:
+        msg: "WERSJA MYSQL JEST ROWNA LUB WYZSZA OD INSTALOWANEJ {{ MDB_VER }}"
+      when: mysql_ver >= MDB_VER_INT
 
     - name: Numer sklepu
       debug:
         msg: "{{ NRSKL }}"
 
-#    - apt:
-#        update_cache: "yes"
-#        name:
-#          - software-properties-common
-#          - python3-mysqldb
-#        state: present
-#      when: ansible_distribution_major_version | int >= 20
+    - apt:
+        update_cache: "yes"
+        name:
+          - software-properties-common
+          - python3-mysqldb
+        state: present
+      when: ansible_distribution_major_version | int >= 20
 
     - apt:
         update_cache: "yes"
@@ -149,11 +149,11 @@
         state: present
       when: ansible_distribution_major_version | int < 18
 
-#    - name: Dodanie repozytoriow
-#      apt_repository:
-#        repo: "deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
-#        state: present
-#        filename: mariadb
+    - name: Dodanie repozytoriow
+      apt_repository:
+        repo: "deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
+        state: present
+        filename: mariadb
 
     - name: Pobiermanie sumy kontrolnej mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz
       get_url:
@@ -191,23 +191,23 @@
         state: stopped
       when: ansible_distribution_major_version | int < 18
     
-#    - name: Usuwanie pakietow mariadb-*
-#      apt:
-#        name:
-#          - mariadb-*
-#          - galera-4
-#          - galera-3
-#          - libssl-dev
-#        state: absent
-#
-#    - name: Instalacja pakietow mariadb-server i mariadb-backup
-#      apt:
-#        update_cache: "yes"
-#        name:
-#          - mariadb-server
-#          - mariadb-backup
-#          - libssl-dev:i386
-#        state: present
+    - name: Usuwanie pakietow mariadb-*
+      apt:
+        name:
+          - mariadb-*
+          - galera-4
+          - galera-3
+          - libssl-dev
+        state: absent
+
+    - name: Instalacja pakietow mariadb-server i mariadb-backup
+      apt:
+        update_cache: "yes"
+        name:
+          - mariadb-server
+          - mariadb-backup
+          - libssl-dev:i386
+        state: present
 
     - name: Dodanie wspiu do /etc/mysql/my.cnf
       blockinfile:
