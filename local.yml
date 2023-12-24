@@ -52,13 +52,13 @@
       debug:
         msg: "{{ NRSKL }}"
 
-    - apt:
-        update_cache: "yes"
-        name:
-          - software-properties-common
-          - python3-mysqldb
-        state: present
-      when: ansible_distribution_major_version | int >= 20
+#    - apt:
+#        update_cache: "yes"
+#        name:
+#          - software-properties-common
+#          - python3-mysqldb
+#        state: present
+#      when: ansible_distribution_major_version | int >= 20
 
     - apt:
         update_cache: "yes"
@@ -436,3 +436,6 @@
       file:
         path: /usr/local/lib/mariadb
         state: absent
+
+    - debug:
+        msg: "AKTUALIZACJA OK" 
