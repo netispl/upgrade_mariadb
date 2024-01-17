@@ -413,5 +413,10 @@
         path: /usr/local/lib/mariadb
         state: absent
 
+    - name: Restart MySql
+      service:
+        name: mysql
+        state: restarted
+
     - debug:
         msg: "AKTUALIZACJA OK" 
