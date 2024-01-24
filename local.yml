@@ -273,6 +273,14 @@
         line: /opt/mariadb-connector-c-3.2.5-linux-i686/lib/mariadb/
         state: present
 
+    - name: Usuwanie wpisow z /etc/ld.so.conf.d/hm.conf
+      lineinfile:
+        path: /etc/ld.so.conf.d/hm.conf
+        state: absent
+        line: '/usr/local/lib/mariadb/'
+
+    - command: ldconfig
+    
     - name: Sprawdzanie zrodel do HM
       command: "grep SRC= /usr/local/sklep{{ NRSKL }}/konfiguracja/.src"
       register: src
@@ -330,13 +338,6 @@
     - name: Kompilacja HM
       shell: make -C "{{ src_path }}/src" clean all
 
-    - name: Usuwanie wpisow z /etc/ld.so.conf.d/hm.conf
-      lineinfile:
-        path: /etc/ld.so.conf.d/hm.conf
-        state: absent
-        line: '/usr/local/lib/mariadb/'
-
-    - command: ldconfig
 
     - name: Zmiana w proj_local.pri
       replace:
