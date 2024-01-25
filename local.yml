@@ -154,7 +154,15 @@
         repo: "deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
         state: present
         filename: mariadb
+      when: ansible_distribution_major_version | int > 16
 
+    - name: Dodanie repozytoriow
+      apt_repository:
+        repo: "deb [arch=amd64,arm64,ppc64el] http://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
+        state: present
+        filename: mariadb
+      when: ansible_distribution_major_version | int < 18 
+    
     - name: Pobiermanie sumy kontrolnej mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz
       get_url:
         url: "https://downloads.mariadb.com/Connectors/c/connector-c-{{ MDBC_VER }}/sha256sums.txt"
