@@ -56,17 +56,23 @@
         update_cache: "yes"
         name:
           - software-properties-common
+        state: present
+
+    - name: Instalacja pakietu python3-mysqldb
+      apt:
+        name:
           - python3-mysqldb
         state: present
-      when: ansible_distribution_major_version | int >= 20
-
-    - apt:
-        update_cache: "yes"
+      ignore_errors: true
+      when: ansible_python_version.split('.')[0] | int == 3 or ansible_distribution_major_version | int >= 20
+    
+    - name: Instalacja pakietu python-mysqldb
+      apt:
         name:
-          - software-properties-common
           - python-mysqldb
         state: present
-      when: ansible_distribution_major_version | int < 20
+      ignore_errors: true
+      when: ansible_python_version.split('.')[0] | int == 2 or ansible_distribution_major_version | int < 20
 
     - name: Set MariaDB name on Ubuntu 16
       set_fact:
