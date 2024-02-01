@@ -68,6 +68,16 @@
         state: present
       when: ansible_distribution_major_version | int < 20
 
+    - name: Set MariaDB name on Ubuntu 16
+      set_fact:
+        mysql_service_name: "mysql"
+      when: ansible_distribution_major_version | int < 18
+    
+    - name: Set MariaDB name on Ubuntu 18 and above
+      set_fact:
+        mysql_service_name: "mariadb.service"
+      when: ansible_distribution_major_version | int > 16
+
     - name: Usuwanie katalogu backup
       file:
         path: "{{ backup }}"
@@ -83,16 +93,9 @@
 
     - name: Start MySql
       service:
-        name: mariadb
+        name: "{{ mysql_service_name }}"
         state: started
-      when: ansible_distribution_major_version | int > 16 and BACKUP == "yes"
     
-    - name: Start MySql
-      service:
-        name: mysql
-        state: started
-      when: ansible_distribution_major_version | int < 18 and BACKUP == "yes"
-
     - name: Tworzenie backupu baz danych
       shell:
       args:
@@ -189,16 +192,9 @@
 
     - name: Stop MySql
       service:
-        name: mariadb
+        name: "{{ mysql_service_name }}"
         state: stopped
-      when: ansible_distribution_major_version | int > 16
 
-    - name: Stop MySql
-      service:
-        name: mysql
-        state: stopped
-      when: ansible_distribution_major_version | int < 18
-    
     - name: Usuwanie pakietow mariadb-*
       apt:
         name:
@@ -239,16 +235,9 @@
 
     - name: Start MySql
       service:
-        name: mariadb
+        name: "{{ mysql_service_name }}"
         state: started
-      when: ansible_distribution_major_version | int > 16
     
-    - name: Start MySql
-      service:
-        name: mysql
-        state: started
-      when: ansible_distribution_major_version | int < 18
-
     - name: "Rozpakowanie mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz"
       unarchive:
         src: "/tmp/mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz"
@@ -422,10 +411,18 @@
         path: /usr/local/lib/mariadb
         state: absent
 
-    - name: Restart MySql
+    - name: MySQL upgrade
+      shell: mysql_upgrade
+    
+    - name: Stop MySQL
       service:
-        name: mysql
-        state: restarted
+        name: "{{ mysql_service_name }}"
+        state: stopped
+    
+    - name: Start MySQL
+      service:
+        name: "{{ mysql_service_name }}"
+        state: started
 
     - debug:
         msg: "AKTUALIZACJA OK" 
