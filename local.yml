@@ -417,9 +417,6 @@
         path: /usr/local/lib/mariadb
         state: absent
 
-    - name: MySQL upgrade
-      shell: mysql_upgrade
-    
     - name: Stop MySQL
       service:
         name: "{{ mysql_service_name }}"
@@ -430,5 +427,8 @@
         name: "{{ mysql_service_name }}"
         state: started
 
+    - name: MySQL upgrade
+      shell: mysql_upgrade
+    
     - debug:
         msg: "AKTUALIZACJA OK" 
