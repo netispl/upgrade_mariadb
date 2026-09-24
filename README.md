@@ -16,3 +16,7 @@ sudo ansible-pull -i hosts -U https://github.com/netispl/upgrade_mariadb
 sudo ansible-pull -i hosts -U https://github.com/netispl/upgrade_mariadb -e NRSKL=00 -e BACKUP=no
 sudo ansible-pull -i hosts -U https://github.com/netispl/upgrade_mariadb -e NRSKL=00 -e BACKUP=no -e QT=yes
 ```
+Ubuntu > 18
+```
+PYTHONUNBUFFERED=1 ansible-pull -i hosts -U https://github.com/netispl/upgrade_mariadb
+```
