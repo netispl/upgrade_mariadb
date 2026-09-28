@@ -186,7 +186,7 @@
     - name: Pobranie mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz
       get_url:
         #url: "https://downloads.mariadb.com/Connectors/c/connector-c-{{ MDBC_VER }}/mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz"
-        url: "https://dwl.netis.pl/public/tools/mariadb-connector-c-{{ MDBC_VER }}-src.tar.
+        url: "https://dwl.netis.pl/public/tools/mariadb-connector-c-{{ MDBC_VER }}-src.tar.gz"
         dest: "/tmp/"
         timeout: 60
         #checksum: "sha256:{{ sha256.stdout }}"
