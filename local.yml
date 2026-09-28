@@ -160,14 +160,16 @@
 
     - name: Dodanie repozytoriow
       apt_repository:
-        repo: "deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
+        repo: "deb [arch=amd64,arm64,ppc64el] https://deb.mariadb.org/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
+        #repo: "deb [arch=amd64,arm64,ppc64el] https://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
         state: present
         filename: mariadb
       when: ansible_distribution_major_version | int > 16
 
     - name: Dodanie repozytoriow
       apt_repository:
-        repo: "deb [arch=amd64,arm64,ppc64el] http://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
+        repo: "deb [arch=amd64,arm64,ppc64el] http://deb.mariadb.org/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
+        #repo: "deb [arch=amd64,arm64,ppc64el] http://mariadb.mirror.liquidtelecom.com/repo/{{ MDB_VER }}/ubuntu {{ ansible_distribution_release }} main"
         state: present
         filename: mariadb
       when: ansible_distribution_major_version | int < 18 
